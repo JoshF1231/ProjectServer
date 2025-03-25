@@ -46,9 +46,10 @@ def login():
     user = cur.fetchone()
     cur.close()
     if bcrypt.checkpw(password.encode('utf-8'),user['password'].encode('utf-8')):
-        return jsonify({"message":"Succesfully logged in !"}),201
+        access_token = create_access_token(identity=username)
+        return jsonify(access_token),200
     else:
-        return jsonify({"error": "Incorrect username or password"})
+        return jsonify({"error": "Incorrect username or password"}),401
 #    if user and check_password_hash(user['password'],password):
 #        return jsonify({"message":"Succesfully logged in !"}),201
 
