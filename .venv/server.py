@@ -25,7 +25,9 @@ Bcrypt(app)
 
 def register_blueprints():
     from routes import auth
+    from routes import tasks
     app.register_blueprint(auth.bp)
+    app.register_blueprint(tasks.bp)
 
 if __name__ == '__main__':
     register_blueprints()

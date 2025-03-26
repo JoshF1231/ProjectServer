@@ -1,8 +1,7 @@
 import bcrypt
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from server import mysql
-from werkzeug.security import generate_password_hash, check_password_hash
 from MySQLdb.cursors import DictCursor  # Import DictCursor
 from flask_bcrypt import Bcrypt
 
@@ -52,4 +51,18 @@ def login():
         return jsonify({"error": "Incorrect username or password"}),401
 #    if user and check_password_hash(user['password'],password):
 #        return jsonify({"message":"Succesfully logged in !"}),201
+
+@bp.route('/user', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    current_user = get_jwt_identity()
+    cur = mysql.connection.cursor(DictCursor)
+    cur.execute("SELECT * FROM users WHERE username = %s", (current_user,))
+    user_data = cur.fetchone()
+    cur.close()
+    if user_data:
+        return jsonify(user_data), 200
+    else:
+        return jsonify({"error":"User not found"}),404
+
 
